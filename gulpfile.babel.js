@@ -1,10 +1,13 @@
+import fs from 'fs'
+import path from 'path'
 import gulp from 'gulp'
 import jade from 'gulp-jade'
 import stylus from 'gulp-stylus'
 import babel from 'gulp-babel'
-import uglify from 'gulp-uglify'
 import nib from 'nib'
 import del from 'del'
+import Crx from 'crx'
+import packageInfo from './package'
 
 gulp
   .task('jade', () => gulp
@@ -24,7 +27,7 @@ gulp
   .task('babel', () => gulp
     .src('./app/scripts/*.js?(x)')
     .pipe(babel())
-    .pipe(gulp.dest('./app/scripts/build'));
+    .pipe(gulp.dest('./app/scripts/build'))
   )
   .task('watch', () => {
     gulp.watch('./app/pages/*.jade', ['jade'])
@@ -42,7 +45,26 @@ gulp
   .task('default', ['cp', 'jade', 'stylus', 'babel', 'watch'])
 
 gulp
-  .task('pack', () => del('crx', () => gulp
+  .task('prepack', () => gulp
     .src(['./app/**/*', '!./app/**/*.styl', '!./app/**/*.jade'])
     .pipe(gulp.dest('./crx'))
-  ))
+  )
+  .task('pack', ['prepack'], () => {
+    const crx = new Crx({
+      rootDirectory: './crx',
+      privateKey: fs.readFileSync('crx.pem').toString()
+    })
+
+    crx
+      .load()
+      .then(() => crx.loadContents())
+      .then(archiveBuffer => fs.writeFile(path.join(
+          __dirname,
+          `v${packageInfo.version}.zip`), archiveBuffer))
+      .then(archiveBuffer => crx.pack(archiveBuffer))
+      .then(crxBuffer => fs.writeFile(path.join(
+          __dirname,
+          `v${packageInfo.version}.crx`), crxBuffer)
+      )
+      .catch(e => console.error(e))
+  })
