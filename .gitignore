@@ -1,13 +1,9 @@
 node_modules
-bower_components
 app.*
-app/components
 
 *.zip
 *.crx
 
-*.sublime-workspace
-*.sublime-project
 *.pem
 build
 crx
