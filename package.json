@@ -23,5 +23,20 @@
   },
   "babel": {
     "presets": ["es2015", "react"]
+  },
+  "eslintConfig": {
+    "extends": [
+      "standard",
+      "standard-react"
+    ],
+    "plugins": [
+      "standard"
+    ],
+    "env": {
+      "builtin": true,
+      "node": true,
+      "browser": true,
+      "jquery": true
+    }
   }
 }
