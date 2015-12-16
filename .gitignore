@@ -7,3 +7,4 @@ app.*
 *.pem
 build
 crx
+Thumbs.db
