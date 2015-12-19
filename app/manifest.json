@@ -10,7 +10,7 @@
   "default_locale": "en",
   "background": {
     "scripts": [
-      "scripts/background.js"
+      "build/background.js"
     ]
   },
   "browser_action": {
@@ -19,9 +19,9 @@
       "38": "images/icon-38.png"
     },
     "default_title": "Quick DevDocs",
-    "default_popup": "pages/build/popup.html"
+    "default_popup": "build/popup.html"
   },
-  "options_page": "pages/build/options.html#apparence",
+  "options_page": "build/options.html#apparence",
   "permissions": [
     "cookies",
     "http://devdocs.io/",
