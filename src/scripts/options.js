@@ -1,10 +1,12 @@
-$(() => {
-  let $optionPages = $('.option-page')
-  let $optionNavs = $('.option-nav')
+import 'jquery/dist/jquery.min'
 
-  let switchOptionPage = (index) => {
-    let $prevPage = $optionPages.not('.hidden')
-    let $currentPage = $optionPages.eq(index)
+$(() => {
+  const $optionPages = $('.option-page')
+  const $optionNavs = $('.option-nav')
+
+  const switchOptionPage = (index) => {
+    const $prevPage = $optionPages.not('.hidden')
+    const $currentPage = $optionPages.eq(index)
 
     $optionNavs
       .removeClass('selected')
@@ -25,7 +27,7 @@ $(() => {
 
   $(window)
     .on('hashchange', () => {
-      let $targetNav = $(location.hash.replace(/#/, '.option-'))
+      const $targetNav = $(location.hash.replace(/#/, '.option-'))
       let index = $targetNav.index()
       console.log($targetNav, index)
       index = index !== -1 ? index : 0
@@ -35,12 +37,12 @@ $(() => {
 
   $('.option-docs')
     .on('show', (() => {
-      let $iframe = $('.option-docs iframe')
+      const $iframe = $('.option-docs iframe')
       return () => {
         if (!$iframe.attr('src')) {
           $iframe.attr('src', 'http://devdocs.io')
             .load(() => {
-              let $arrow = $('.arrow')
+              const $arrow = $('.arrow')
               $arrow
                 .click(() => {
                   $(this).remove()
@@ -65,7 +67,7 @@ $(() => {
 
   $('.theme')
     .on('change', 'input', () => {
-      let $themeInput = $(this)
+      const $themeInput = $(this)
       localStorage.setItem('theme', $themeInput.val())
     })
     .find('.' + localStorage.getItem('theme'))
@@ -73,21 +75,21 @@ $(() => {
 
   $('.size')
     .on('input', '.width', () => {
-      let $width = $(this)
-      let width = $width.val()
+      const $width = $(this)
+      const width = $width.val()
       $width.next().html(width)
       localStorage.setItem('width', width)
     })
     .on('input', '.height', () => {
-      let $height = $(this)
-      let height = $height.val()
+      const $height = $(this)
+      const height = $height.val()
       $height.next().html(height)
       localStorage.setItem('height', height)
     })
     .find('input')
     .val(() => {
-      let $size = $(this)
-      let key = $size.attr('name')
+      const $size = $(this)
+      const key = $size.attr('name')
       return localStorage.getItem(key)
     })
     .trigger('input')

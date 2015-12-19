@@ -3,12 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "jade-html-loader": "0.0.3",
+    "jquery": "^2.1.4",
     "lodash": "^3.10.1",
     "react": "^0.14.3",
-    "react-dom": "^0.14.3",
-    "script-loader": "^0.6.1",
-    "superagent": "^1.5.0"
+    "react-dom": "^0.14.3"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",
@@ -29,8 +27,12 @@
     "gulp-webpack": "^1.5.0",
     "html-loader": "^0.4.0",
     "html-webpack-plugin": "^1.7.0",
+    "jade-html-loader": "0.0.3",
     "nib": "^1.1.0",
+    "node-sass": "^3.4.2",
     "raw-loader": "^0.5.1",
+    "sass-loader": "^3.1.2",
+    "script-loader": "^0.6.1",
     "style-loader": "^0.13.0",
     "stylus-loader": "^1.4.2",
     "webpack": "^1.12.9"
@@ -54,6 +56,10 @@
       "browser": true,
       "jquery": true,
       "webextensions": true
+    },
+    "globals": {
+      "React": false,
+      "ReactDOM": false
     }
   }
 }
