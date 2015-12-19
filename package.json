@@ -3,26 +3,42 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "jade-html-loader": "0.0.3",
     "lodash": "^3.10.1",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
+    "script-loader": "^0.6.1",
     "superagent": "^1.5.0"
   },
   "devDependencies": {
     "babel-core": "^6.3.17",
+    "babel-loader": "^6.2.0",
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-react": "^6.3.13",
+    "babelify": "^7.2.0",
     "crx": "^3.0.3",
+    "css-loader": "^0.23.0",
     "del": "^2.2.0",
+    "extract-text-webpack-plugin": "^0.9.1",
     "gulp": "^3.9.0",
     "gulp-babel": "^6.1.1",
+    "gulp-browserify": "^0.5.1",
     "gulp-jade": "^1.1.0",
     "gulp-stylus": "^2.1.1",
     "gulp-uglify": "^1.5.1",
-    "nib": "^1.1.0"
+    "gulp-webpack": "^1.5.0",
+    "html-loader": "^0.4.0",
+    "html-webpack-plugin": "^1.7.0",
+    "nib": "^1.1.0",
+    "raw-loader": "^0.5.1",
+    "style-loader": "^0.13.0",
+    "stylus-loader": "^1.4.2",
+    "webpack": "^1.12.9"
   },
   "babel": {
-    "presets": ["es2015", "react"]
+    "presets": [
+      "es2015"
+    ]
   },
   "eslintConfig": {
     "extends": [
@@ -36,7 +52,8 @@
       "builtin": true,
       "node": true,
       "browser": true,
-      "jquery": true
+      "jquery": true,
+      "webextensions": true
     }
   }
 }

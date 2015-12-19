@@ -18,7 +18,4 @@ html
       .result._list-item(class!='_icon-<%= result.category %>' data-score!='<%= result.score + "|"+ result.message %>' data-type!='<%= result.type %>' data-path!='<%= result.path %>' data-category!='<%= result.category %>') <%= _.escape(result.name) %>
       | <% }) %>
 
-    script(src='/components/jquery.min.js')
-    script(src='/components/lodash.min.js')
-    script(src='/components/backbone.js')
     script(src='/scripts/popup.js')

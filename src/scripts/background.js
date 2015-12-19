@@ -1,48 +1,52 @@
-/* global _, chrome */
-let log = function(msg) {
-  return function(x) {
+import _ from 'lodash'
+import superagent from 'superagent'
+
+console.log(superagent)
+
+let log = function (msg) {
+  return function (x) {
     console.log(msg)
     return x
   }
 }
-let getCategoriesFromCookie = function(cookie) {
+let getCategoriesFromCookie = function (cookie) {
   let defaultCategories = ['css', 'dom', 'dom_events', 'html', 'http', 'javascript']
-  return _.get(cookie, 'value') ?
-    cookie.value.split('/') :
-    defaultCategories
+  return _.get(cookie, 'value')
+    ? cookie.value.split('/')
+    : defaultCategories
 }
-let getQueryFromCategory = function(category) {
+let getQueryFromCategory = function (category) {
   let hosts = 'http://maxcdn-docs.devdocs.io'
   let path = '/' + category + '/index.json'
   return $.ajax(hosts + path)
 }
 let getQueriesFromCookie = _.compose(
-  log('Fetching documents\'s entries...'),
+  log("Fetching documents's entries..."),
   _.partial(_.map, _, getQueryFromCategory),
   getCategoriesFromCookie
 )
-let processPromise = function(queryWidhCategory) {
+let processPromise = function (queryWidhCategory) {
   let query = _.first(queryWidhCategory)
   let category = _.last(queryWidhCategory)
-  let getExtendedEntry = function(entry) {
+  let getExtendedEntry = function (entry) {
     return _.assign(entry, {
       category: category
     })
   }
-  let getEntriesFromRes = function(res) {
+  let getEntriesFromRes = function (res) {
     return _.map(res.entries, getExtendedEntry)
   }
   return query.then(getEntriesFromRes)
 }
 
-let getQueriesWithCategories = function(cookie) {
+let getQueriesWithCategories = function (cookie) {
   return _.zip(
     getQueriesFromCookie(cookie),
     getCategoriesFromCookie(cookie)
   )
 }
 
-let getChars = function(str) {
+let getChars = function (str) {
   let words = _.trim(str).toLowerCase().match(/\w+/g)
   if (!words || words.length === 0) {
     return ''
@@ -51,15 +55,15 @@ let getChars = function(str) {
 }
 let getRegFromQuery = _.compose(
   _.partial(RegExp, _, 'i'),
-  _.partial(_.reduce, _, function(prev, current) {
+  _.partial(_.reduce, _, function (prev, current) {
     return prev + (
-      /\.|\(|\)/.test(current) ?
-      '' :
-      (current + '.*')
+    /\.|\(|\)/.test(current)
+      ? ''
+      : (current + '.*')
     )
   }, '.*')
 )
-let getEntryScore = function(entry, query) {
+let getEntryScore = function (entry, query) {
   let name = getChars(entry.name)
   let fullName = entry.category + name
   let testName = _.bind(RegExp.prototype.test, getRegFromQuery(query))
@@ -82,17 +86,17 @@ let getEntryScore = function(entry, query) {
 }
 
 let getScore = _.partial(_.get, _, 'score')
-let getSearcher = function(entries) {
-  return _.memoize(function(query) {
+let getSearcher = function (entries) {
+  return _.memoize(function (query) {
     console.log('searching for ' + query)
-    let addEntryScore = function(entry) {
+    let addEntryScore = function (entry) {
       return _.assign(entry, {
         score: getEntryScore(entry, query)
       })
     }
-    return _.compose(_.isEmpty, getChars)(query) ?
-      null :
-      _.sortBy(
+    return _.compose(_.isEmpty, getChars)(query)
+      ? null
+      : _.sortBy(
         _.filter(
           _.map(entries, addEntryScore),
           _.compose(_.negate(_.isNaN), getScore)
@@ -100,19 +104,19 @@ let getSearcher = function(entries) {
         getScore
       )
   })
-
 }
-let getmsghandler = function(searcher) {
-  return function(message, sender, sendResponse) {
+
+let getmsghandler = function (searcher) {
+  return function (message, sender, sendResponse) {
     console.log('msg is coming')
     return _.compose(sendResponse, searcher, getChars)(message)
   }
 }
-let getpromises = function(cookie) {
+let getpromises = function (cookie) {
   return _.map(getQueriesWithCategories(cookie), processPromise)
 }
-let startlisten = function(cookie) {
-  return $.when.apply($, getpromises(cookie)).then(function() {
+let startlisten = function (cookie) {
+  return $.when.apply($, getpromises(cookie)).then(function () {
     let listener = _.compose(getmsghandler, getSearcher, _.flatten)(arguments)
     chrome.runtime.onMessage.addListener(listener)
     return listener
@@ -124,11 +128,11 @@ let listenpromise
 chrome.cookies.get({
   url: 'http://devdocs.io',
   name: 'docs'
-}, function(cookie) {
+}, function (cookie) {
   listenpromise = startlisten(cookie)
 })
 
-chrome.cookies.onChanged.addListener(_.debounce(function(changeInfo) {
+chrome.cookies.onChanged.addListener(_.debounce(function (changeInfo) {
   let cookie = changeInfo.cookie
   if (cookie.domain === 'devdocs.io' && cookie.name === 'docs') {
     console.log('Cookie is changed to ' + cookie.value + '!')
@@ -137,7 +141,7 @@ chrome.cookies.onChanged.addListener(_.debounce(function(changeInfo) {
   }
 }, 500))
 
-//open a welcome page after install
+// open a welcome page after install
 if (_.any([localStorage.install_time, localStorage.version], _.isUndefined)) {
   chrome.tabs.create({
     url: 'pages/build/options.html#welcome'
