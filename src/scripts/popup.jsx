@@ -1,18 +1,63 @@
-import debounce from 'lodash/function/debounce'
 import 'react/dist/react-with-addons.min'
 import 'react-dom/dist/react-dom.min'
+import {isArray, merge, debounce, identity, map} from 'lodash'
+import {createStore, combineReducers} from 'redux'
+import {connect, Provider} from 'react-redux'
+
+const replaceResults = function (state = {}, action) {
+  switch (action.type) {
+    case 'SEARCH':
+      return merge(state, {
+        query: action.query,
+        results: isArray(action.results)
+          ? action.results
+          : [],
+        content: null
+      })
+    default:
+      return state
+  }
+}
+
+const openContent = function (state = {}, action) {
+  switch (action.type) {
+    case 'OPEN':
+      return {
+        content: action.content
+      }
+    default:
+      return state
+  }
+}
+
+const reducer = combineReducers({
+  replaceResults, openContent
+})
+
+let store = createStore(reducer)
 
 const Search = React.createClass({
-  updateResults (results) {
-    console.log(results)
+  propTypes: {
+    query: React.PropTypes.string
   },
 
   search: debounce(function (e) {
-    console.log(this.updateResults)
-    chrome.runtime.sendMessage(e.target.value, this.updateResults)
+    const query = e.target.value
+    const {dispatch} = this.props
+
+    chrome.runtime
+      .sendMessage(query, function (results) {
+        const searchAction = {
+          type: 'SEARCH',
+          results
+        }
+
+        dispatch(searchAction)
+      })
   }, 500),
 
   render () {
+    const {query} = this.props
     return (
       <div className='_header'>
        <form className='_search'>
@@ -21,6 +66,7 @@ const Search = React.createClass({
            className='input _search-input'
            autoFocus='autofocus'
            placeholder='Search...'
+           value={query}
            onChange={this.search} />
        </form>
      </div>
@@ -30,34 +76,60 @@ const Search = React.createClass({
 
 const Splash = React.createClass({
   render () {
-    return <div className='splash _splash-title'>
-             DevDocs
-           </div>
+    return (
+      <div className='splash _splash-title'>DevDocs</div>
+    )
   }
 })
 
 const Results = React.createClass({
   propTypes: {
-    name: React.PropTypes.string.isRequired
+    results: React.PropTypes.array
   },
   render () {
+    const {results} = this.props
+    console.log(results)
     return (
-      <div>Hello</div>
+      <div className='results'>
+        {map(results, result => (
+          <div className='result _list-item'>
+            {result.name}
+          </div>
+        ))}
+      </div>
     )
   }
 })
 
-const Result = React.createClass({
+const Content = React.createClass({
   render () {
-    return <div>content</div>
+    return <div className='content'>Content</div>
   }
 })
 
-ReactDOM.render((
-  <div>
-    <Search />
-    <Splash />
-    <Results />
-    <Result />
-  </div>
-  ), document.body)
+let App = React.createClass({
+  propTypes: {
+    query: React.PropTypes.string,
+    results: React.PropTypes.array,
+    content: React.PropTypes.string
+  },
+  render () {
+    return (
+      <div style={{width: 500, height: 500}}>
+        <Search {...this.props} />
+        <Splash {...this.props} />
+        <Results {...this.props} />
+        <Content {...this.props} />
+      </div>
+    )
+  }
+})
+
+App = connect(identity)(App)
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.body
+)
